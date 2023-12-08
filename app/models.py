@@ -53,5 +53,17 @@ class Unit(models.Model):
     
     name           = models.CharField(max_length=255)
     type           = models.CharField(choices=CHOICES_TYPE, default=UNIT, max_length=20)
+    chief          = models.CharField(max_length=255) # Chef d'unité
+    effective      = models.IntegerField(default=0)
     description    = models.TextField()
     
+    
+    
+#Les articles 
+class Item(models.Model):
+    custom_id       = CustomPrimaryKeyField(primary_key=True, prefix='P')
+    name            = models.CharField(max_length=100)
+    image           = models.ImageField(upload_to="Articles/%Y/")
+    price           = models.DecimalField(max_digits=10, decimal_places=2)
+    rate            = models.DecimalField(max_digits=5, decimal_places=2)
+    description     = models.TextField()
