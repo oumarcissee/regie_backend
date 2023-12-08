@@ -2,9 +2,30 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.core.mail import send_mail
-
+from django.db import models
 import random
 
+
+
+class CustomPrimaryKeyField(models.CharField):
+    def __init__(self, prefix='', *args, **kwargs):
+        self.prefix = prefix
+        super().__init__(max_length=10, unique=True, *args, **kwargs)
+
+    def pre_save(self, model_instance, add):
+        if add:
+            last_object = model_instance.__class__.objects.last()
+            if last_object:
+                last_key = last_object.pk
+                if last_key.startswith(self.prefix):
+                    last_num = int(last_key[len(self.prefix):])
+                    new_key = f'{self.prefix}{last_num + 1}'
+                    setattr(model_instance, self.attname, new_key)
+                    return new_key
+        return super().pre_save(model_instance, add)
+    
+    
+    
 
 def send_email(subject, message, user_to):
     
