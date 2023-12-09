@@ -35,7 +35,13 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return self.email
-
+    
+    
+#Chaque unité doit appartenir a une zone
+class Area(models.Model):
+    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='Z')
+    name                = models.CharField(max_length=255)
+    description         = models.TextField()
 
 #Toutes les unites
 class Unit(models.Model):
@@ -50,13 +56,12 @@ class Unit(models.Model):
         (MISSION, 'Mission'),
         (SERVICE , 'Service')    
     ) 
-    
+    area           = models.ForeignKey(Area, related_name='area_unit', on_delete=models.CASCADE)
     name           = models.CharField(max_length=255)
     type           = models.CharField(choices=CHOICES_TYPE, default=UNIT, max_length=20)
     chief          = models.CharField(max_length=255) # Chef d'unité
     effective      = models.IntegerField(default=0)
     description    = models.TextField()
-    
     
     
 #Les fournisseurs
@@ -74,10 +79,13 @@ class Item(models.Model):
     custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='P')
     name                = models.CharField(max_length=100)
     image               = models.ImageField(upload_to="Articles/%Y/")
-    price               = models.DecimalField(max_digits=10, decimal_places=2)
+    price               = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     rate_per_person     = models.DecimalField(max_digits=5, decimal_places=2)
+    divider             = models.IntegerField(default=0) 
     description         = models.TextField()
     
+#Apres avoir fait les bons de commande
+#Les fournisseurs doivent livrer les articles commandé
 #Les stocks des articles
 #Les fournisseurs peuvent fournires les produits
 class itemStock(models.Model):
@@ -89,14 +97,13 @@ class itemStock(models.Model):
         (STORE_B, 'Store_b'),
     )
     
-    
     provider            = models.ForeignKey(Provider, related_name='providers', on_delete=models.CASCADE)
     item                = models.ForeignKey(Item, related_name='items', on_delete=models.CASCADE)
     quantity            = models.IntegerField(default=0)
     store_type          = models.CharField(choices=CHOICES_STORE, default=STORE_A)
-    modified_at         = models.DateTimeField(auto_now_add=True)
+    created_at          = models.DateTimeField(auto_now_add=True)
     
-    
+  
 #Les bons de commandes
 #On peut faire un bon de commande vue la quantité en stock 
 class Order(models.Model):
@@ -116,25 +123,23 @@ class Order(models.Model):
     quantity            = models.IntegerField(default=0)
     created_at          = models.DateTimeField(auto_now_add=True)
 
+
+#les unités peuvent avoir besion des depenses en plus les denrees
+class Menu(models.Model):
     
-#Apres avoir fait les bons de commande
-#Les fournisseurs doivent livrer les articles commandé
-class Delivery(models.Model):
+    FOOD  = 'food'
+    OTHER = 'other'
     
-    STORE_A = 'store_a'
-    STORE_B = 'store_b'
-    
-    CHOICES_STORE = (
-        (STORE_A, 'Store_a'),
-        (STORE_B, 'Store_b'),
+    CHOICES_TYPE = (
+        (FOOD, 'Food'),
+        (OTHER, 'Other')
     )
     
-    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='L')
-    provider            = models.ForeignKey(Provider, related_name='provider_delivery', on_delete=models.CASCADE)
-    item                = models.ForeignKey(Item, related_name='item_delivery', on_delete=models.CASCADE)
-    store_type          = models.CharField(choices=CHOICES_STORE, default=STORE_A)
-    quantity            = models.IntegerField(default=0)
-    created_at          = models.DateTimeField(auto_now_add=True)
-
+    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='MD')
+    name                = models.CharField(max_length=255)
+    menu_type           = models.CharField(choices=CHOICES_TYPE, default=FOOD)
+    #amount              = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    description         = models.TextField()
     
     
+#La regie peut faire les boredereaux
