@@ -59,11 +59,82 @@ class Unit(models.Model):
     
     
     
+#Les fournisseurs
+class Provider(models.Model):
+    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='F')
+    name                = models.CharField(max_length=255)
+    phone_number        = models.CharField(max_length=50)
+    email               = models.EmailField(max_length=100, null=True)
+    address             = models.CharField(max_length=200)
+    
+    
 #Les articles 
+#Les peuvent fournires les produits
 class Item(models.Model):
-    custom_id       = CustomPrimaryKeyField(primary_key=True, prefix='P')
-    name            = models.CharField(max_length=100)
-    image           = models.ImageField(upload_to="Articles/%Y/")
-    price           = models.DecimalField(max_digits=10, decimal_places=2)
-    rate            = models.DecimalField(max_digits=5, decimal_places=2)
-    description     = models.TextField()
+    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='P')
+    name                = models.CharField(max_length=100)
+    image               = models.ImageField(upload_to="Articles/%Y/")
+    price               = models.DecimalField(max_digits=10, decimal_places=2)
+    rate_per_person     = models.DecimalField(max_digits=5, decimal_places=2)
+    description         = models.TextField()
+    
+#Les stocks des articles
+#Les fournisseurs peuvent fournires les produits
+class itemStock(models.Model):
+    STORE_A = 'store_a'
+    STORE_B = 'store_b'
+    
+    CHOICES_STORE = (
+        (STORE_A, 'Store_a'),
+        (STORE_B, 'Store_b'),
+    )
+    
+    
+    provider            = models.ForeignKey(Provider, related_name='providers', on_delete=models.CASCADE)
+    item                = models.ForeignKey(Item, related_name='items', on_delete=models.CASCADE)
+    quantity            = models.IntegerField(default=0)
+    store_type          = models.CharField(choices=CHOICES_STORE, default=STORE_A)
+    modified_at         = models.DateTimeField(auto_now_add=True)
+    
+    
+#Les bons de commandes
+#On peut faire un bon de commande vue la quantité en stock 
+class Order(models.Model):
+    
+    STORE_A = 'store_a'
+    STORE_B = 'store_b'
+    
+    CHOICES_STORE = (
+        (STORE_A, 'Store_a'),
+        (STORE_B, 'Store_b'),
+    )
+    
+    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='BC')
+    provider            = models.ForeignKey(Provider, related_name='provider_order', on_delete=models.CASCADE)
+    item                = models.ForeignKey(Item, related_name='item_order', on_delete=models.CASCADE)
+    store_type          = models.CharField(choices=CHOICES_STORE, default=STORE_A)
+    quantity            = models.IntegerField(default=0)
+    created_at          = models.DateTimeField(auto_now_add=True)
+
+    
+#Apres avoir fait les bons de commande
+#Les fournisseurs doivent livrer les articles commandé
+class Delivery(models.Model):
+    
+    STORE_A = 'store_a'
+    STORE_B = 'store_b'
+    
+    CHOICES_STORE = (
+        (STORE_A, 'Store_a'),
+        (STORE_B, 'Store_b'),
+    )
+    
+    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='L')
+    provider            = models.ForeignKey(Provider, related_name='provider_delivery', on_delete=models.CASCADE)
+    item                = models.ForeignKey(Item, related_name='item_delivery', on_delete=models.CASCADE)
+    store_type          = models.CharField(choices=CHOICES_STORE, default=STORE_A)
+    quantity            = models.IntegerField(default=0)
+    created_at          = models.DateTimeField(auto_now_add=True)
+
+    
+    
