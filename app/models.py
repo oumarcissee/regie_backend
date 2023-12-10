@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-from app.utils.utils import CustomPrimaryKeyField
+from app.utils.utils import CustomPrimaryKeyField, CustomDate
 
 from django.utils.text import slugify
 
@@ -38,34 +38,37 @@ class User(AbstractUser):
     
     
 #Chaque unité doit appartenir a une zone
-class Area(models.Model):
+class Area(CustomDate, models.Model):
     custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='Z')
     name                = models.CharField(max_length=255)
     description         = models.TextField()
 
 #Toutes les unites
-class Unit(models.Model):
+class Unit(CustomDate, models.Model):
     UNIT        = 'unit'
     SCHOOL      = 'school'
     MISSION     = 'mission'
     SERVICE     = 'service'
+    SINGLE      = 'single'
    
     CHOICES_TYPE = (
         (UNIT, 'Unit'),
         (SCHOOL, 'School'),
         (MISSION, 'Mission'),
-        (SERVICE , 'Service')    
+        (SERVICE , 'Service'),
+        (SINGLE, 'Single')  
     ) 
     area           = models.ForeignKey(Area, related_name='area_unit', on_delete=models.CASCADE)
     name           = models.CharField(max_length=255)
     type           = models.CharField(choices=CHOICES_TYPE, default=UNIT, max_length=20)
     chief          = models.CharField(max_length=255) # Chef d'unité
     effective      = models.IntegerField(default=0)
+    duration       = models.IntegerField(default=0) #la durée de la mission ou formation
     description    = models.TextField()
     
     
-#Les fournisseurs
-class Provider(models.Model):
+#Les fournisseurs                                       
+class Provider(CustomDate, models.Model):
     custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='F')
     name                = models.CharField(max_length=255)
     phone_number        = models.CharField(max_length=50)
@@ -75,7 +78,7 @@ class Provider(models.Model):
     
 #Les articles 
 #Les peuvent fournires les produits
-class Item(models.Model):
+class Item(CustomDate, models.Model):
     custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='P')
     name                = models.CharField(max_length=100)
     image               = models.ImageField(upload_to="Articles/%Y/")
@@ -87,8 +90,8 @@ class Item(models.Model):
 #Apres avoir fait les bons de commande
 #Les fournisseurs doivent livrer les articles commandé
 #Les stocks des articles
-#Les fournisseurs peuvent fournires les produits
-class itemStock(models.Model):
+#Les fournisseurs peuvent fournitures les produits
+class itemStock(CustomDate, models.Model):
     STORE_A = 'store_a'
     STORE_B = 'store_b'
     
@@ -96,17 +99,16 @@ class itemStock(models.Model):
         (STORE_A, 'Store_a'),
         (STORE_B, 'Store_b'),
     )
-    
+    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='S')
     provider            = models.ForeignKey(Provider, related_name='providers', on_delete=models.CASCADE)
     item                = models.ForeignKey(Item, related_name='items', on_delete=models.CASCADE)
     quantity            = models.IntegerField(default=0)
     store_type          = models.CharField(choices=CHOICES_STORE, default=STORE_A)
-    created_at          = models.DateTimeField(auto_now_add=True)
     
   
 #Les bons de commandes
 #On peut faire un bon de commande vue la quantité en stock 
-class Order(models.Model):
+class Order(CustomDate, models.Model):
     
     STORE_A = 'store_a'
     STORE_B = 'store_b'
@@ -116,16 +118,15 @@ class Order(models.Model):
         (STORE_B, 'Store_b'),
     )
     
-    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='BC')
+    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='C')
     provider            = models.ForeignKey(Provider, related_name='provider_order', on_delete=models.CASCADE)
     item                = models.ForeignKey(Item, related_name='item_order', on_delete=models.CASCADE)
     store_type          = models.CharField(choices=CHOICES_STORE, default=STORE_A)
     quantity            = models.IntegerField(default=0)
-    created_at          = models.DateTimeField(auto_now_add=True)
 
 
 #les unités peuvent avoir besion des depenses en plus les denrees
-class Menu(models.Model):
+class Menu(CustomDate, models.Model):
     
     FOOD  = 'food'
     OTHER = 'other'
@@ -135,11 +136,30 @@ class Menu(models.Model):
         (OTHER, 'Other')
     )
     
-    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='MD')
+    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='D')
     name                = models.CharField(max_length=255)
-    menu_type           = models.CharField(choices=CHOICES_TYPE, default=FOOD)
+    type                = models.CharField(choices=CHOICES_TYPE, default=FOOD)
     #amount              = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     description         = models.TextField()
     
     
-#La regie peut faire les boredereaux
+#Les regies peuvent faire les boredereaux afin de servire les unites
+#ou les indivudus.
+class Discharge(CustomDate, models.Model):
+    SLIP  = 'slip' #Bordereau
+    CERT  = 'cert' #Bon de sorti
+    
+    CHOICES_TYPE = (
+        (SLIP, 'Slip'),
+        (CERT, 'Cert')
+    )
+    
+    custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='B')
+    type                = models.CharField(choices=CHOICES_TYPE, default=SLIP)
+    item                = models.ForeignKey(Item, related_name='items_disch', on_delete=models.CASCADE,blank=True, null=True)
+    Menu                = models.ForeignKey(Menu, related_name='menus', on_delete=models.CASCADE)
+    unit                = models.ForeignKey(Unit, related_name='units', on_delete=models.CASCADE)
+    discharged          = models.BooleanField(default=False)
+    file                = models.FileField(upload_to="Decharges/%Y/", blank=True, null=True)
+
+    

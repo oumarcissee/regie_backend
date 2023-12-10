@@ -24,7 +24,12 @@ class CustomPrimaryKeyField(models.CharField):
                     return new_key
         return super().pre_save(model_instance, add)
     
-    
+class CustomDate(models.Model):
+    created_at  = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
     
 
 def send_email(subject, message, user_to):
