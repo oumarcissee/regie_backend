@@ -7,10 +7,14 @@ import random
 
 
 
+from django.db import models
+
 class CustomPrimaryKeyField(models.CharField):
     def __init__(self, prefix='', *args, **kwargs):
         self.prefix = prefix
-        super().__init__(max_length=10, unique=True, *args, **kwargs)
+        kwargs['max_length'] = 10  # Assurez-vous que max_length est défini dans kwargs
+        kwargs['unique'] = True    # Assurez-vous que unique est défini dans kwargs
+        super().__init__(*args, **kwargs)  # Appelez l'initialisation de CharField sans max_length et unique
 
     def pre_save(self, model_instance, add):
         if add:
@@ -23,6 +27,7 @@ class CustomPrimaryKeyField(models.CharField):
                     setattr(model_instance, self.attname, new_key)
                     return new_key
         return super().pre_save(model_instance, add)
+
     
 class CustomDate(models.Model):
     created_at  = models.DateTimeField(auto_now_add=True)

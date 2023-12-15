@@ -84,6 +84,7 @@ class Item(CustomDate, models.Model):
     image               = models.ImageField(upload_to="Articles/%Y/")
     price               = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     rate_per_person     = models.DecimalField(max_digits=5, decimal_places=2)
+    unite               = models.CharField(max_length=100)
     divider             = models.IntegerField(default=0) 
     description         = models.TextField()
     
@@ -103,7 +104,7 @@ class itemStock(CustomDate, models.Model):
     provider            = models.ForeignKey(Provider, related_name='providers', on_delete=models.CASCADE)
     item                = models.ForeignKey(Item, related_name='items', on_delete=models.CASCADE)
     quantity            = models.IntegerField(default=0)
-    store_type          = models.CharField(choices=CHOICES_STORE, default=STORE_A)
+    store_type          = models.CharField(choices=CHOICES_STORE, default=STORE_A, max_length=10)
     
   
 #Les bons de commandes
@@ -121,7 +122,7 @@ class Order(CustomDate, models.Model):
     custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='C')
     provider            = models.ForeignKey(Provider, related_name='provider_order', on_delete=models.CASCADE)
     item                = models.ForeignKey(Item, related_name='item_order', on_delete=models.CASCADE)
-    store_type          = models.CharField(choices=CHOICES_STORE, default=STORE_A)
+    store_type          = models.CharField(choices=CHOICES_STORE, default=STORE_A,max_length=10)
     quantity            = models.IntegerField(default=0)
 
 
@@ -138,7 +139,7 @@ class Menu(CustomDate, models.Model):
     
     custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='D')
     name                = models.CharField(max_length=255)
-    type                = models.CharField(choices=CHOICES_TYPE, default=FOOD)
+    type                = models.CharField(choices=CHOICES_TYPE, default=FOOD, max_length=10)
     #amount              = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     description         = models.TextField()
     
@@ -155,7 +156,7 @@ class Discharge(CustomDate, models.Model):
     )
     
     custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='B')
-    type                = models.CharField(choices=CHOICES_TYPE, default=SLIP)
+    type                = models.CharField(choices=CHOICES_TYPE, default=SLIP, max_length=10)
     item                = models.ForeignKey(Item, related_name='items_disch', on_delete=models.CASCADE,blank=True, null=True)
     Menu                = models.ForeignKey(Menu, related_name='menus', on_delete=models.CASCADE)
     unit                = models.ForeignKey(Unit, related_name='units', on_delete=models.CASCADE)
