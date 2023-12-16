@@ -61,8 +61,8 @@ class Unit(CustomDate, models.Model):
     area           = models.ForeignKey(Area, related_name='area_unit', on_delete=models.CASCADE)
     name           = models.CharField(max_length=255)
     type           = models.CharField(choices=CHOICES_TYPE, default=UNIT, max_length=20)
-    chief          = models.CharField(max_length=255) # Chef d'unité
-    effective      = models.IntegerField(default=0)
+    chief          = models.CharField(max_length=255, blank=True, null=True) # Chef d'unité
+    effective      = models.IntegerField(default=1)
     duration       = models.IntegerField(default=0) #la durée de la mission ou formation
     description    = models.TextField()
     
@@ -81,9 +81,9 @@ class Provider(CustomDate, models.Model):
 class Item(CustomDate, models.Model):
     custom_id           = CustomPrimaryKeyField(primary_key=True, prefix='P')
     name                = models.CharField(max_length=100)
-    image               = models.ImageField(upload_to="Articles/%Y/")
+    image               = models.ImageField(upload_to="Articles/%Y/", null=True)
     price               = models.DecimalField(max_digits=20, decimal_places=2, default=0)
-    rate_per_person     = models.DecimalField(max_digits=5, decimal_places=2)
+    rate_per_days       = models.DecimalField(max_digits=5, decimal_places=2)
     unite               = models.CharField(max_length=100)
     divider             = models.IntegerField(default=0) 
     description         = models.TextField()
