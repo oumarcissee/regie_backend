@@ -1,5 +1,6 @@
 amqp==5.2.0
 asgiref==3.7.2
+async-timeout==4.0.3
 attrs==23.1.0
 autobahn==23.6.2
 Automat==22.10.0
@@ -30,7 +31,7 @@ idna==3.4
 incremental==22.10.0
 kombu==5.3.3
 msgpack==1.0.7
-mysqlclient==2.2.0
+mysqlclient==2.2.1
 oauthlib==3.2.2
 Pillow==10.0.1
 prompt-toolkit==3.0.39
