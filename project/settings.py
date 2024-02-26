@@ -199,9 +199,9 @@ SITE_NAME ="Mon site frontend"
 
 
 DJOSER = {
-    # 'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
-    # 'USERNAME_RESET_CONFIRM_URL': 'username/reset/confirm/{uid}/{token}',
-    # 'ACTIVATION_URL'            : 'activate/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': 'username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL'            : 'activate/{uid}/{token}',
     # 'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
     # 'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
     # 'PASSWORD_RESET_CONFIRM_RETYPE': True,
@@ -210,7 +210,7 @@ DJOSER = {
     # 'SET_PASSWORD_RETYPE'          : True,
     # 'USER_CREATE_PASSWORD_RETYPE'  : True,
     # 'SEND_CONFIRMATION_EMAIL'      : True,
-    # 'SEND_ACTIVATION_EMAIL'        : True,
+    'SEND_ACTIVATION_EMAIL'        : True,
     
 
     
@@ -227,7 +227,7 @@ EMAIL_BACKEND        = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST           = 'smtp.gmail.com'
 EMAIL_PORT           =  587
 EMAIL_HOST_USER      = 'oumarcisse.bfk@gmail.com'
-EMAIL_HOST_PASSWORD  = 'xppglwfvezaskgyt' 
+EMAIL_HOST_PASSWORD  = 'xagogzvdptclxfui' 
 EMAIL_USE_TLS        =  True
 DEFAULT_FROM_EMAIL   = 'Mon site web'
 

@@ -15,7 +15,6 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Chargez les tâches de manière automatique depuis tous les modules "tasks.py" de votre projet
 app.autodiscover_tasks()
 
-
 # Nouvelle option pour activer la reconnexion au broker au démarrage
 app.conf.broker_connection_retry_on_startup = True
 
