@@ -3,9 +3,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from .serializers import UserCreateSerializer
+from django.core.mail import send_mail
 
 from app.utils.utils import shuffle_password
-from app.tasks import send_email_task
+from app.tasks import send_email_task, send_sms_task
 
 
 class CustomUserCreateView(APIView):
@@ -69,7 +70,10 @@ class CreateUserProvider(APIView):
             
             try: 
                 #Envoi de mail asynchrone
-                send_email_task.delay(user_to=to, data=data)
+                send_email_task.delay(to, data)
+                
+                #Envoi des messages
+                # send_sms_task.delay(phone_number,f"Bonjour {last_name}, c'est un message de test.")
                 
                 user = User.objects.create_user(
                     username=username, email=email, phone_number=phone_number,
@@ -81,6 +85,7 @@ class CreateUserProvider(APIView):
                 # user = User.objects.get(email=email)
                 # user.delete()
                 # user.save()
-                return Response({'error': f'Une erreur de {str(e)} s\'est produite lors de l\'envoi de l\'e-mail'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response({'error': f'Une erreur de {str(e)} s\'est produite lors de l\'envoi de l\'e-mail ou sms'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        

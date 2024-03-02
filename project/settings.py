@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     
+    'django_twilio',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
@@ -229,9 +230,24 @@ EMAIL_PORT           =  587
 EMAIL_HOST_USER      = 'oumarcisse.bfk@gmail.com'
 EMAIL_HOST_PASSWORD  = 'xagogzvdptclxfui' 
 EMAIL_USE_TLS        =  True
+EMAIL_USE_SSL        =  False
 DEFAULT_FROM_EMAIL   = 'Mon site web'
 
 
 # Configuration de Celery
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+
+
+"""
+    TWILIO_RECOVERY_CODE = WL2MUY8XUUZ9QCNYSPD2T7E7
+"""
+TWILIO_PHONE_NUMBER =  '+224628797137'
+TWILIO_DEFAULT_CALLERID = '+224'
+
+TWILIO_ACCOUNT_SID = 'AC4aae43ccbb15f6c465099088874cb4ba'
+TWILIO_AUTH_TOKEN  = '68d484cb2eb54dcf46609c9009c96a78'
+
+TWILIO_ACCOUNT_SID_TEST = 'AC1de3aba702536713a13ad1544b4f30fc'
+TWILIO_AUTH_TOKEN_TEST  = 'a4499265554043662a2e849f941ca78f'
