@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import viewsets
 from django.contrib.auth import get_user_model
 from .serializers import UserCreateSerializer
 from django.core.mail import send_mail
@@ -8,10 +9,11 @@ from django.core.mail import send_mail
 from app.utils.utils import shuffle_password
 from app.tasks import send_email_task, send_sms_task
 
+User = get_user_model()
+
 
 class CustomUserCreateView(APIView):
     def post(self, request, format=None):
-        User = get_user_model()
     
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -49,9 +51,9 @@ class CustomUserCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class CreateUserProvider(APIView):
     def post(self, request, format=None):
-        User = get_user_model()
     
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -70,7 +72,8 @@ class CreateUserProvider(APIView):
             
             try: 
                 #Envoi de mail asynchrone
-                send_email_task.delay(to, data)
+                # send_email_task.delay(to, data)
+                print (f"Mot de pass est: {data['shuffled_password']}")
                 
                 #Envoi des messages
                 # send_sms_task.delay(phone_number,f"Bonjour {last_name}, c'est un message de test.")
@@ -89,3 +92,27 @@ class CreateUserProvider(APIView):
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
+        
+        
+        
+
+# class NewsLimitOffsetPagination(LimitOffsetPagination):
+#     page_size = 3
+#     page_size_query_param = 'page_size'
+#     max_page_size = 1000
+
+class GetUSerModelViewsets(viewsets.ModelViewSet):
+    serializer_class    = UserCreateSerializer
+    queryset            = User.objects.all()
+    # lookup_field        = 'slug'
+
+    # pagination_class = NewsLimitOffsetPagination
+    
+    # filter_backends = (filters.SearchFilter,)
+    # search_fields   = ('title', 'content','created_at',)
+    
+    def get_queryset(self):
+        return User.objects.order_by('-id')
+    
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)

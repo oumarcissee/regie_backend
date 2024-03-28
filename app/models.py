@@ -32,6 +32,7 @@ class User(AbstractUser):
     email           = models.EmailField(max_length=150, unique=True)
     address         = models.CharField(max_length=200, blank=True, null=True)
     role            = models.CharField(choices=CHOICES_ROLE, default=EMPTY, max_length=20)
+    image           = models.ImageField(upload_to='user_images/', default='user_images/default.jpg', blank=True, null=True)
     
     USERNAME_FIELD  = 'username'
     REQUIRED_FIELDS = ['email','role', 'matricule', 'phone_number']
