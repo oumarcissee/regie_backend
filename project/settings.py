@@ -218,7 +218,7 @@ DJOSER = {
     'SERIALIZERS': {
         'user_create': 'app.controllers.User.serializers.UserCreateSerializer',
         'user'       : 'app.controllers.User.serializers.UserCreateSerializer',
-        'user_delete': 'app.controllers.User.serializers.UserDeleteSerializer',
+        'user_delete': 'djoser.serializers.UserDeleteSerializer',
     }
       
 }

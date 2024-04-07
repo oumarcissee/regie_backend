@@ -94,7 +94,7 @@ class Item(CustomDate, models.Model):
     description         = models.TextField()
     
 #Apres avoir fait les bons de commande
-#Les fournisseurs doivent livrer les articles commandé
+#Les fournisseurs doivent livrer les articles commandés
 #Les stocks des articles
 #Les fournisseurs peuvent fournitures les produits
 class itemStock(CustomDate, models.Model):
