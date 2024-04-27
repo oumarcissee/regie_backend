@@ -3,38 +3,33 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.core.mail import send_mail
 from django.db import models
+from django.db.models import  signals
+
 import random
 
 
+from django.db.models import Max
 
-from django.db import models
 
-class CustomPrimaryKeyField(models.CharField):
-    def __init__(self, prefix='', *args, **kwargs):
-        self.prefix = prefix
-        kwargs['max_length'] = 10  # Assurez-vous que max_length est défini dans kwargs
-        kwargs['unique'] = True    # Assurez-vous que unique est défini dans kwargs
-        super().__init__(*args, **kwargs)  # Appelez l'initialisation de CharField sans max_length et unique
-
-    def pre_save(self, model_instance, add):
-        if add:
-            last_object = model_instance.__class__.objects.last()
-            if last_object:
-                last_key = last_object.pk
-                if last_key.startswith(self.prefix):
-                    last_num = int(last_key[len(self.prefix):])
-                    new_key = f'{self.prefix}{last_num + 1}'
-                    setattr(model_instance, self.attname, new_key)
-                    return new_key
-        return super().pre_save(model_instance, add)
-
-    
 class CustomDate(models.Model):
     created_at  = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
+
+class CustomModel(CustomDate):
+    ref       = models.CharField(max_length=50, unique=True)
+    
+    class Meta:
+        abstract = True  # Cette classe est abstraite pour être étendue
+
+
+        """formats
+        """
+def format_valeur(lettre, nombre):
+    return f"{lettre.upper()}{nombre:03d}"
+
     
 
 def send_email(subject, message, user_to):
