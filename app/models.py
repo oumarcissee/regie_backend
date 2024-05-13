@@ -86,7 +86,7 @@ class Item(CustomModel):
     
     name                = models.CharField(max_length=100, unique=True)
     image               = models.ImageField(upload_to="Articles/%Y/",default='user_images/default.jpg')
-    price               = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    price               = models.IntegerField(default=0)
     rate_per_days       = models.DecimalField(max_digits=5, decimal_places=2)
     unite               = models.CharField(choices=CHOICES_TYPE, default=BAG, max_length=20)
     divider             = models.IntegerField(default=0) 
@@ -113,17 +113,9 @@ class itemStock(CustomModel):
 #On peut faire un bon de commande vue la quantité en stock 
 class Order(CustomModel):
     
-    STORE_A = 'store_a'
-    STORE_B = 'store_b'
-    
-    CHOICES_STORE = (
-        (STORE_A, 'Store_a'),
-        (STORE_B, 'Store_b'),
-    )
-    
     provider            = models.ForeignKey(User, related_name='provider_order', on_delete=models.CASCADE, blank=True, null=True)
     item                = models.ForeignKey(Item, related_name='item_order', on_delete=models.CASCADE)
-    store_type          = models.CharField(choices=CHOICES_STORE, default=STORE_A,max_length=10)
+    status              = models.BooleanField(default=True)
     quantity            = models.IntegerField(default=0)
 
 

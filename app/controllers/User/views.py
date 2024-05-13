@@ -6,6 +6,7 @@ from rest_framework import viewsets
 from django.contrib.auth import get_user_model
 from .serializers import UserCreateSerializer,UserUpdateSerializer
 from django.core.mail import send_mail
+from rest_framework.decorators import action
 
 from app.utils.utils import shuffle_password
 from app.tasks import send_email_task, send_sms_task
@@ -16,13 +17,12 @@ User = get_user_model()
 
 class UserList(APIView):
     
-    def get(self, request):
-        objets = User.objects.order_by('-id')
-        serializer = UserCreateSerializer(objets, many=True)
-        return Response(serializer.data)
+    # def get(self, request):
+    #     objets = User.objects.filter(role='provider').order_by('-id')
+    #     serializer = UserCreateSerializer(objets, many=True)
+    #     return Response(serializer.data)
 
     def post(self, request, format=None):
-    
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
             username        = request.data.get('username')
@@ -68,6 +68,8 @@ class UserList(APIView):
         Returns:
             _type_: _description_
         """
+        
+        
 class UserDetail(APIView):
     def get_object(self, pk):
         try:
@@ -102,12 +104,13 @@ class UserDetail(APIView):
         objet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
         
+        
 
+        """Classe de recupération
 
-
-
-
-
+        Returns:
+            _type_: _description_
+        """
 class UserModelViewsets(viewsets.ModelViewSet):
     serializer_class    = UserCreateSerializer
     queryset            = User.objects.all()
@@ -118,3 +121,26 @@ class UserModelViewsets(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
         
+
+    # @action(detail=False, methods=['get'])
+    # def providers(self, request):
+    #     data = User.objects.filter(role='provider').order_by('-id')
+    #     print(data, "Ou rien")
+    #     serializer = self.get_serializer(data, many=True)
+    #     return Response(serializer.data)
+    
+        """get providers
+
+        Returns:
+            _type_: _description_
+        """
+class ProvidersModelViewsets(viewsets.ModelViewSet):
+    serializer_class    = UserCreateSerializer
+    queryset            = User.objects.all()
+    
+    def get_queryset(self):
+        return User.objects.filter(role='provider').order_by('-id')
+    
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+    
