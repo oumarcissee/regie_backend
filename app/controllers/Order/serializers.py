@@ -10,7 +10,4 @@ class OrderReadSerializer(serializers.ModelSerializer):
 class OrderWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model   = Order
-        exclude = ['ref','id',]  # Exclut 'custom_id' pour les requêtes POST, PUT, PATCH
-        # fields = '__all__'
-       # depth  = 1
-        
+        exclude = ['ref']  # Exclut 'custom_id' pour les requêtes POST, PUT, PATCH

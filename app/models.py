@@ -33,7 +33,7 @@ class User(AbstractUser):
     image           = models.ImageField(upload_to='user_images/', default='user_images/default.jpg', blank=True, null=True)
     
     USERNAME_FIELD  = 'username'
-    REQUIRED_FIELDS = ['email','role', 'matricule', 'phone_number']
+    REQUIRED_FIELDS = ['email','role', 'matricule', 'phone_number', 'get_full_name', 'get_short_name', 'image']
 
     def __str__(self) -> str:
         return self.email
@@ -112,13 +112,16 @@ class itemStock(CustomModel):
 #Les bons de commandes
 #On peut faire un bon de commande vue la quantité en stock 
 class Order(CustomModel):
-    
-    provider            = models.ForeignKey(User, related_name='provider_order', on_delete=models.CASCADE, blank=True, null=True)
-    item                = models.ForeignKey(Item, related_name='item_order', on_delete=models.CASCADE)
+    provider            = models.ForeignKey(User, related_name='provider_order', on_delete=models.CASCADE)
     status              = models.BooleanField(default=True)
+    
+# C'est une table qui relie la table order et la commande
+#Ligne de commande
+class OrderLine(CustomModel):
+    item                = models.ForeignKey(Item, related_name='item_order', on_delete=models.CASCADE)
+    order               = models.ForeignKey(Order, related_name='orderItem', on_delete=models.CASCADE)
     quantity            = models.IntegerField(default=0)
-
-
+    
 #les unités peuvent avoir besion des depenses en plus les denrees
 class Menu(CustomModel):
     
@@ -155,4 +158,16 @@ class Discharge(CustomModel):
     discharged          = models.BooleanField(default=False)
     file                = models.FileField(upload_to="Decharges/%Y/", blank=True, null=True)
 
+#La gestion du temps
+################################
 
+# class Date(models.Model):
+#     created_at      = models.DateTimeField(auto_now_add=True)
+#     nomber_of_days  = models.IntegerField(default=0) # le nombre de jours du mois courant
+#     description     = models.CharField(max_length=255, null=True, blank=True)
+    
+class Archives(models.Model):
+    order            = models.ForeignKey(Order, related_name='order_archiv', on_delete=models.CASCADE, null=True)
+    discharge        = models.ForeignKey(Discharge, related_name='discharge_archiv', on_delete=models.CASCADE, null=True)
+    date             = models.DateTimeField()
+    nomber_of_days   = models.IntegerField(default=0)

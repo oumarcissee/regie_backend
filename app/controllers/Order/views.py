@@ -19,8 +19,6 @@ class OrderModelViewsets(viewsets.ModelViewSet):
         return Order.objects.order_by('-id')
     
     def perform_create(self, serializer):
-        # Récupérer le dernier enregistrement dans la base de données
         last = Order.objects.last()
         last_id = last.id if last else 0
         serializer.save(ref=format_valeur('C', last_id+1))
-        
