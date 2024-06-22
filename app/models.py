@@ -160,14 +160,9 @@ class Discharge(CustomModel):
 
 #La gestion du temps
 ################################
-
-# class Date(models.Model):
-#     created_at      = models.DateTimeField(auto_now_add=True)
-#     nomber_of_days  = models.IntegerField(default=0) # le nombre de jours du mois courant
-#     description     = models.CharField(max_length=255, null=True, blank=True)
-    
+ 
 class Archives(models.Model):
     order            = models.ForeignKey(Order, related_name='order_archiv', on_delete=models.CASCADE, null=True)
     discharge        = models.ForeignKey(Discharge, related_name='discharge_archiv', on_delete=models.CASCADE, null=True)
-    date             = models.DateTimeField()
+    date             = models.DateField(auto_now_add=True)
     nomber_of_days   = models.IntegerField(default=0)

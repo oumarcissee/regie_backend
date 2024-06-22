@@ -6,7 +6,7 @@ urlpatterns = [
     #La urls de la commande
     path('orders/', include('app.controllers.Order.urls')),
     path('orders-line/', include('app.controllers.OrderLine.urls')),
-    path('archives/', include('app.controllers.OrderArchive.urls')),
+    path('archives/', include('app.controllers.Archives.urls')),
 ] 
 
 

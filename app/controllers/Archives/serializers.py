@@ -10,6 +10,4 @@ class ArchivesReadSerializer(serializers.ModelSerializer):
 class ArchivesWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model   = Archives
-        exclude = ['date']  # Exclut 'custom_id' pour les requêtes POST, PUT, PATCH
-        # fields = '__all__'
-        depth  = 1
+        exclude = ['nomber_of_days']  # Exclut 'custom_id' pour les requêtes POST, PUT, PATCH
