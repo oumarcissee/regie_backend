@@ -19,7 +19,7 @@ class CustomDate(models.Model):
         abstract = True
 
 class CustomModel(CustomDate):
-    ref       = models.CharField(max_length=50, unique=True)
+    ref       = models.CharField(max_length=50, unique=True, null=True)
     
     class Meta:
         abstract = True  # Cette classe est abstraite pour être étendue

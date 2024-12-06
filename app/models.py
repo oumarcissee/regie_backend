@@ -166,3 +166,30 @@ class Archives(models.Model):
     discharge        = models.ForeignKey(Discharge, related_name='discharge_archiv', on_delete=models.CASCADE, null=True)
     date             = models.DateField(auto_now_add=True)
     nomber_of_days   = models.IntegerField(default=0)
+        
+##Les divers
+
+##Les signateurs
+class SignalOperators(models.Model):
+
+    DEFAULT = 'default'
+    LEFT    = 'left' #Premier signateur
+    RIGHT   = 'right' # Deuxième signateur
+    CENTER  = 'center' # Troisième signateur
+
+    
+    CHOICES_POS = (
+       (DEFAULT, 'Default'), (LEFT, 'Left'), (RIGHT, 'Right'), (CENTER, 'Center'),
+    )# Les différentes position des signatures
+    
+    
+    first_name      = models.CharField(max_length=200)
+    last_name       = models.CharField(max_length=200)
+    function_name   = models.CharField(max_length=200)
+    title           = models.CharField(max_length=200)
+    position        = models.CharField(choices=CHOICES_POS, default=DEFAULT, max_length=20)
+    
+    
+    
+  
+    
