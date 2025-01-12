@@ -6,7 +6,7 @@ from .serializers import SignalOperatorsReadSerializer, SignalOperatorsWriteSeri
 
 from app.models import SignalOperators
 
-class ItemModelViewsets(viewsets.ModelViewSet):
+class SignalOperatorsModelViewsets(viewsets.ModelViewSet):
     queryset            = SignalOperators.objects.all()
     
     def get_serializer_class(self):

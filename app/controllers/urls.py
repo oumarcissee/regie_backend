@@ -8,7 +8,9 @@ urlpatterns = [
     path('orders-line/', include('app.controllers.OrderLine.urls')),
     path('archives/', include('app.controllers.Archives.urls')),
     
-    path('signal-operators/', include('app.controllers.SignalOperators.urls')),
+    path('operators/', include('app.controllers.SignalOperators.urls')),
+    
+    path('unites/', include('app.controllers.Unit.urls')),
 ] 
 
 

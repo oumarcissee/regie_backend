@@ -9,6 +9,6 @@ class SignalOperatorsReadSerializer(serializers.ModelSerializer):
 class SignalOperatorsWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = SignalOperators
-        exclude = ['ref','id']  # Exclut 'custom_id' pour les requêtes POST, PUT, PATCH
+        exclude = ['ref']  # Exclut 'custom_id' pour les requêtes POST, PUT, PATCH
         # fields = '__all__'
         

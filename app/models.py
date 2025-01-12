@@ -39,35 +39,73 @@ class User(AbstractUser):
         return self.email
     
     
-#Chaque unité doit appartenir a une zone
-class Area(CustomModel):
-    name                = models.CharField(max_length=255)
-    description         = models.TextField()
 
 
 #Toutes les unites
 class Unit(CustomModel):
     UNIT        = 'unit'
     SCHOOL      = 'school'
+    
+    CHOICES_TYPE = (
+        (UNIT, 'Unit'),
+        (SCHOOL, 'School')
+    ) 
+    
     MISSION     = 'mission'
     SERVICE     = 'service'
     SINGLE      = 'single'
-   
-    CHOICES_TYPE = (
-        (UNIT, 'Unit'),
-        (SCHOOL, 'School'),
+    
+    CHOICES_TYPE_OF_UNIT = (
+        
         (MISSION, 'Mission'),
         (SERVICE , 'Service'),
         (SINGLE, 'Single')  
     ) 
-    area           = models.ForeignKey(Area, related_name='area_unit', on_delete=models.CASCADE)
+    
+    EMAT = 'emat'
+    EMAA = 'emaa'
+    EMAM = 'emam'
+    HCGN = 'hcgn'
+    
+    GENERAL_STAFF = (
+        (EMAT, 'Emat'),
+        (EMAA, 'Emaa'),
+        (EMAM, 'Emam'),
+        (HCGN, 'Hcgn'),
+    )
+    
+    SPECIALE_AREA   = 'speciale'    #Zone sepeciale
+    FIRST_AREA      = 'first'       #Prèmire region
+    SECOND_AREA     = 'second'      # Deuxième region Militaire
+    THIRD_AREA      = 'third'       # Troisième region Militaire
+    FOURTH_AREA     = 'fourth'      # Quatrième region Militaire
+    
+    MILITARY_AREA = (
+        (SPECIALE_AREA, 'Speciale'),
+        (FIRST_AREA, 'First'),
+        (SECOND_AREA, 'Second'),
+        (THIRD_AREA, 'Third'),
+        (FOURTH_AREA, 'Fourth'),
+    )
+   
+
     name           = models.CharField(max_length=255)
+    g_staff        = models.CharField(choices=GENERAL_STAFF, default=EMAT, max_length=20)
+    area           = models.CharField(choices=MILITARY_AREA, default=SPECIALE_AREA, max_length=100)
+    type_of_unit   = models.CharField(choices=CHOICES_TYPE_OF_UNIT, default=UNIT, max_length=20)
     type           = models.CharField(choices=CHOICES_TYPE, default=UNIT, max_length=20)
     chief          = models.CharField(max_length=255, blank=True, null=True) # Chef d'unité
     effective      = models.IntegerField(default=1)
     duration       = models.IntegerField(default=0) #la durée de la mission ou formation
     description    = models.TextField()
     
+    
+#Chaque unité doit appartenir a une zone
+class SubArea(CustomModel):
+    name                = models.CharField(max_length=255)
+    description         = models.TextField()
+    unites              = models.ForeignKey(Unit, related_name='sub_area_unit', on_delete=models.CASCADE)
+
 
     
 #Les articles 
@@ -140,7 +178,7 @@ class Menu(CustomModel):
     
     
 #Les regies peuvent faire les boredereaux afin de servire les unites
-#ou les indivudus.
+#ou les indivudus.CustomModel
 class Discharge(CustomModel):
     SLIP  = 'slip' #Bordereau
     CERT  = 'cert' #Bon de sorti
@@ -170,24 +208,23 @@ class Archives(models.Model):
 ##Les divers
 
 ##Les signateurs
-class SignalOperators(models.Model):
+class SignalOperators(CustomModel):
 
     DEFAULT = 'default'
     LEFT    = 'left' #Premier signateur
     RIGHT   = 'right' # Deuxième signateur
     CENTER  = 'center' # Troisième signateur
-
     
     CHOICES_POS = (
        (DEFAULT, 'Default'), (LEFT, 'Left'), (RIGHT, 'Right'), (CENTER, 'Center'),
     )# Les différentes position des signatures
     
-    
+    grade           = models.CharField(max_length=200)
     first_name      = models.CharField(max_length=200)
     last_name       = models.CharField(max_length=200)
     function_name   = models.CharField(max_length=200)
     title           = models.CharField(max_length=200)
-    position        = models.CharField(choices=CHOICES_POS, default=DEFAULT, max_length=20)
+    position        = models.CharField(choices=CHOICES_POS, default=DEFAULT, max_length=20,  unique=True)
     
     
     
