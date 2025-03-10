@@ -33,7 +33,7 @@ class User(AbstractUser):
     image           = models.ImageField(upload_to='user_images/', default='user_images/default.jpg', blank=True, null=True)
     
     USERNAME_FIELD  = 'username'
-    REQUIRED_FIELDS = ['email','role', 'matricule', 'phone_number', 'get_full_name', 'get_short_name', 'image']
+    REQUIRED_FIELDS = ['email','role', 'matricule', 'phone_number',]
 
     def __str__(self) -> str:
         return self.email
