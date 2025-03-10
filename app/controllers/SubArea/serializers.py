@@ -1,15 +1,15 @@
 from rest_framework import serializers
-from app.models import Unit
+from app.models import SubArea
 
-class UnitReadSerializer(serializers.ModelSerializer):
+class SubAreaReadSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Unit
+        model = SubArea
         fields = '__all__'  # Inclut tous les champs, y compris 'custom_id' pour les requêtes GET
         depth  = 1
 
-class UnitWriteSerializer(serializers.ModelSerializer):
+class SubAreaWriteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Unit
+        model = SubArea
         exclude = ['ref','id',]  # Exclut 'custom_id' pour les requêtes POST, PUT, PATCH
         # fields = '__all__'
         

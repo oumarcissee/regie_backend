@@ -39,26 +39,31 @@ class User(AbstractUser):
         return self.email
     
     
+class CustomFields(models.Model):
+    name                = models.CharField(max_length=255, unique=True)
+    status              = models.BooleanField(default=True)
+    description         = models.TextField(blank=True,null=True)
 
 
 #Toutes les unites
-class Unit(CustomModel):
-    UNIT        = 'unit'
-    SCHOOL      = 'school'
+class Unit(CustomModel, CustomFields):
+    UNIT        = 'unit' # Pour les unites
+    SCHOOL      = 'school' # pour les ecoles;
+    SERVICE     = 'service' # pour les services
     
-    CHOICES_TYPE = (
+    CHOICES_CATEGORY = (
         (UNIT, 'Unit'),
-        (SCHOOL, 'School')
+        (SCHOOL, 'School'),
+        (SERVICE, 'Service'),
     ) 
     
+    CURRENT     = 'current' # courant
     MISSION     = 'mission'
-    SERVICE     = 'service'
     SINGLE      = 'single'
     
     CHOICES_TYPE_OF_UNIT = (
-        
+        (CURRENT , 'Current'),
         (MISSION, 'Mission'),
-        (SERVICE , 'Service'),
         (SINGLE, 'Single')  
     ) 
     
@@ -87,30 +92,41 @@ class Unit(CustomModel):
         (THIRD_AREA, 'Third'),
         (FOURTH_AREA, 'Fourth'),
     )
-   
 
-    name           = models.CharField(max_length=255)
+    image          = models.ImageField(upload_to="Unit/%Y/",default='user_images/default.jpg')
+    short_name     = models.CharField(max_length=50, default="NULL", unique=True)
+    recipient      = models.CharField(max_length=200, default="NULL")
     g_staff        = models.CharField(choices=GENERAL_STAFF, default=EMAT, max_length=20)
     area           = models.CharField(choices=MILITARY_AREA, default=SPECIALE_AREA, max_length=100)
-    type_of_unit   = models.CharField(choices=CHOICES_TYPE_OF_UNIT, default=UNIT, max_length=20)
-    type           = models.CharField(choices=CHOICES_TYPE, default=UNIT, max_length=20)
-    chief          = models.CharField(max_length=255, blank=True, null=True) # Chef d'unité
+    type_of_unit   = models.CharField(choices=CHOICES_TYPE_OF_UNIT, default=CURRENT, max_length=20)
+    category       = models.CharField(choices=CHOICES_CATEGORY, default=UNIT, max_length=20)
     effective      = models.IntegerField(default=1)
-    duration       = models.IntegerField(default=0) #la durée de la mission ou formation
-    description    = models.TextField()
+  
     
     
 #Chaque unité doit appartenir a une zone
-class SubArea(CustomModel):
-    name                = models.CharField(max_length=255)
-    description         = models.TextField()
-    unites              = models.ForeignKey(Unit, related_name='sub_area_unit', on_delete=models.CASCADE)
-
-
+class SubArea(CustomModel, CustomFields):
     
-#Les articles 
+    SPECIALE_AREA   = 'speciale'    #Zone sepeciale
+    FIRST_AREA      = 'first'       #Prèmire region
+    SECOND_AREA     = 'second'      # Deuxième region Militaire
+    THIRD_AREA      = 'third'       # Troisième region Militaire
+    FOURTH_AREA     = 'fourth'      # Quatrième region Militaire
+    
+    MILITARY_AREA = (
+        (SPECIALE_AREA, 'Speciale'),
+        (FIRST_AREA, 'First'),
+        (SECOND_AREA, 'Second'),
+        (THIRD_AREA, 'Third'),
+        (FOURTH_AREA, 'Fourth'),
+    )
+    
+    
+    area                = models.CharField(choices=MILITARY_AREA, default=SPECIALE_AREA, max_length=100)
+    
+   
 #Les peuvent fournires les produits
-class Item(CustomModel):
+class Item(CustomModel, CustomFields):      
     
     BAG       = 'bag' #Sac
     CAN       = 'can' #Bidon
@@ -122,17 +138,16 @@ class Item(CustomModel):
         (CARDBOARD, 'Cardboard'),
     )
     
-    name                = models.CharField(max_length=100, unique=True)
+
+    
     image               = models.ImageField(upload_to="Articles/%Y/",default='user_images/default.jpg')
     price               = models.IntegerField(default=0)
-    rate_per_days       = models.DecimalField(max_digits=5, decimal_places=2)
+    rate_per_days       = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     unite               = models.CharField(choices=CHOICES_TYPE, default=BAG, max_length=20)
     divider             = models.IntegerField(default=0) 
-    description         = models.TextField(null=True, blank=True,)
+    weight              = models.FloatField(default=0) # Le poid 
     
-#Apres avoir fait les bons de commande
-#Les fournisseurs doivent livrer les articles commandés
-#Les stocks des articles
+
 #Les fournisseurs peuvent fournitures les produits
 class itemStock(CustomModel):
     STORE_A = 'store_a'
@@ -155,28 +170,13 @@ class Order(CustomModel):
     
 # C'est une table qui relie la table order et la commande
 #Ligne de commande
-class OrderLine(CustomModel):
+class OrderLine(models.Model):
     item                = models.ForeignKey(Item, related_name='item_order', on_delete=models.CASCADE)
     order               = models.ForeignKey(Order, related_name='orderItem', on_delete=models.CASCADE)
     quantity            = models.IntegerField(default=0)
-    
-#les unités peuvent avoir besion des depenses en plus les denrees
-class Menu(CustomModel):
-    
-    FOOD  = 'food'
-    OTHER = 'other'
-    
-    CHOICES_TYPE = (
-        (FOOD, 'Food'),
-        (OTHER, 'Other')
-    )
-    
-    name                = models.CharField(max_length=255)
-    type                = models.CharField(choices=CHOICES_TYPE, default=FOOD, max_length=10)
-    #amount              = models.DecimalField(max_digits=20, decimal_places=2, default=0)
-    description         = models.TextField()
-    
-    
+   
+
+
 #Les regies peuvent faire les boredereaux afin de servire les unites
 #ou les indivudus.CustomModel
 class Discharge(CustomModel):
@@ -187,14 +187,56 @@ class Discharge(CustomModel):
         (SLIP, 'Slip'),
         (CERT, 'Cert')
     )
+        
+    FULL        = 'full' # BORDEREAUX COMPLET
+    KIND        = 'espece' # BORDEREAUX ESPECE;
     
-    type                = models.CharField(choices=CHOICES_TYPE, default=SLIP, max_length=10)
-    offset              = models.IntegerField(default=0)  # La compensation de pour les unites
-    item                = models.ForeignKey(Item, related_name='items_disch', on_delete=models.CASCADE,blank=True, null=True)
-    Menu                = models.ForeignKey(Menu, related_name='menus', on_delete=models.CASCADE)
-    unit                = models.ForeignKey(Unit, related_name='units', on_delete=models.CASCADE)
+  
+    CHOICES_CATEGORY = (
+        (FULL, 'Full'), #COMPLETE
+        (KIND, 'Kind'), #ESPECE
+    )
+  
     discharged          = models.BooleanField(default=False)
+    
+    type_disch          = models.CharField(choices=CHOICES_TYPE, default=SLIP, max_length=10)
+    category            = models.CharField(choices=CHOICES_CATEGORY, default=FULL, max_length=10)
     file                = models.FileField(upload_to="Decharges/%Y/", blank=True, null=True)
+    start_at            = models.DateTimeField(default=None , blank=True, null=True)
+    end_at              = models.DateTimeField(default=None , blank=True, null=True)
+
+    def __str__(self):
+        return f"Event from {self.start} to {self.end}"  
+    
+#Les lignes des bordereaux
+class DischargedLines(models.Model):
+    discharge       = models.ForeignKey(Discharge, related_name='discharge_line', on_delete=models.CASCADE)
+    unit            = models.ForeignKey(Unit, related_name='dischargelines_units', on_delete=models.CASCADE)
+    offset          = models.IntegerField(default=0)  # La compensation de pour les unites
+    forfait         = models.BooleanField(default=False)
+    item            = models.ForeignKey(Item, related_name='item_line_disch', on_delete=models.CASCADE)
+    
+#les unités peuvent avoir besion des depenses en plus les denrees
+class Spend(CustomModel, CustomFields):
+    
+    FOOD  = 'food'# Les menu depenses
+    OTHER = 'other'# Les autres dépenses
+    SPEND = 'spend'# Les dépenses
+    
+    CHOICES_TYPE = (
+        (FOOD, 'Food'),
+        (OTHER, 'Other'),
+        (SPEND, 'Spend'),
+    )
+    
+    image               = models.ImageField(upload_to='menu_images/', default='user_images/default.jpg', blank=True, null=True)
+    type_menu           = models.CharField(choices=CHOICES_TYPE, default=FOOD, max_length=10)
+    rate                = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    price               = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    discharges          = models.ForeignKey(Discharge, related_name='spens_disch', on_delete=models.CASCADE, null=True)
+      
+
+
 
 #La gestion du temps
 ################################
@@ -204,8 +246,9 @@ class Archives(models.Model):
     discharge        = models.ForeignKey(Discharge, related_name='discharge_archiv', on_delete=models.CASCADE, null=True)
     date             = models.DateField(auto_now_add=True)
     nomber_of_days   = models.IntegerField(default=0)
+  
         
-##Les divers
+## LES CLASSES 
 
 ##Les signateurs
 class SignalOperators(CustomModel):
@@ -226,7 +269,4 @@ class SignalOperators(CustomModel):
     title           = models.CharField(max_length=200)
     position        = models.CharField(choices=CHOICES_POS, default=DEFAULT, max_length=20,  unique=True)
     
-    
-    
-  
     

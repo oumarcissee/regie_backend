@@ -11,6 +11,12 @@ urlpatterns = [
     path('operators/', include('app.controllers.SignalOperators.urls')),
     
     path('unites/', include('app.controllers.Unit.urls')),
+    path('subareas/', include('app.controllers.SubArea.urls')),
+    
+    #La gestion des boredereaux
+    path('line-discharges/', include('app.controllers.DischargedLine.urls')),
+    path('discharges/', include('app.controllers.Discharge.urls')),
+    path('spends/', include('app.controllers.Spend.urls')),
 ] 
 
 

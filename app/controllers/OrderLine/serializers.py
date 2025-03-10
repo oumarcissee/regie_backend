@@ -9,8 +9,8 @@ class OrderLineReadSerializer(serializers.ModelSerializer):
 
 class OrderLineWriteSerializer(serializers.ModelSerializer):
     class Meta:
+        fields = '__all__'
         model   = OrderLine
-        exclude = ['ref']  # Exclut 'custom_id' pour les requêtes POST, PUT, PATCH
-        # fields = '__all__'
+        # exclude = ['ref']  # Exclut 'custom_id' pour les requêtes POST, PUT, PATCH
        # depth  = 1
         
