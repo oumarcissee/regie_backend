@@ -17,6 +17,7 @@ urlpatterns = [
     path('line-discharges/', include('app.controllers.DischargedLine.urls')),
     path('discharges/', include('app.controllers.Discharge.urls')),
     path('spends/', include('app.controllers.Spend.urls')),
+    path('other-spends/', include('app.controllers.OtherSpend.urls')),
 ] 
 
 

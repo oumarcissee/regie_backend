@@ -17,10 +17,10 @@ class DischargedLinesModelViewsets(viewsets.ModelViewSet):
     
     def get_queryset(self):
         # Récupérer le paramètre dans la requête
-        order_param = self.request.query_params.get('order', None)
+        discharge_param = self.request.query_params.get('discharge', None)
         
-        if order_param is not None:
-            return DischargedLines.objects.filter(order=int(order_param)).order_by('-id')
+        if discharge_param is not None:
+            return DischargedLines.objects.filter(discharge=int(discharge_param)).order_by('-id')
         
         return DischargedLines.objects.order_by('-id')
     

@@ -1,9 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from app.utils.utils import CustomModel
-
-from django.utils.text import slugify
-
+from app.utils.utils import CustomModel, CustomFields
 
 
 #La connexion au système
@@ -38,15 +35,8 @@ class User(AbstractUser):
     def __str__(self) -> str:
         return self.email
     
-    
-class CustomFields(models.Model):
-    name                = models.CharField(max_length=255, unique=True)
-    status              = models.BooleanField(default=True)
-    description         = models.TextField(blank=True,null=True)
-
-
 #Toutes les unites
-class Unit(CustomModel, CustomFields):
+class Unit(CustomFields):
     UNIT        = 'unit' # Pour les unites
     SCHOOL      = 'school' # pour les ecoles;
     SERVICE     = 'service' # pour les services
@@ -100,12 +90,11 @@ class Unit(CustomModel, CustomFields):
     area           = models.CharField(choices=MILITARY_AREA, default=SPECIALE_AREA, max_length=100)
     type_of_unit   = models.CharField(choices=CHOICES_TYPE_OF_UNIT, default=CURRENT, max_length=20)
     category       = models.CharField(choices=CHOICES_CATEGORY, default=UNIT, max_length=20)
+    is_created     = models.BooleanField(default=False)#Permet de savoir si son borderau est crée
     effective      = models.IntegerField(default=1)
-  
-    
-    
+
 #Chaque unité doit appartenir a une zone
-class SubArea(CustomModel, CustomFields):
+class SubArea(CustomFields):
     
     SPECIALE_AREA   = 'speciale'    #Zone sepeciale
     FIRST_AREA      = 'first'       #Prèmire region
@@ -124,10 +113,8 @@ class SubArea(CustomModel, CustomFields):
     
     area                = models.CharField(choices=MILITARY_AREA, default=SPECIALE_AREA, max_length=100)
     
-   
 #Les peuvent fournires les produits
-class Item(CustomModel, CustomFields):      
-    
+class Item(CustomFields):      
     BAG       = 'bag' #Sac
     CAN       = 'can' #Bidon
     CARDBOARD = 'cardboard' # carton
@@ -138,8 +125,6 @@ class Item(CustomModel, CustomFields):
         (CARDBOARD, 'Cardboard'),
     )
     
-
-    
     image               = models.ImageField(upload_to="Articles/%Y/",default='user_images/default.jpg')
     price               = models.IntegerField(default=0)
     rate_per_days       = models.DecimalField(max_digits=5, decimal_places=2, default=0)
@@ -147,7 +132,6 @@ class Item(CustomModel, CustomFields):
     divider             = models.IntegerField(default=0) 
     weight              = models.FloatField(default=0) # Le poid 
     
-
 #Les fournisseurs peuvent fournitures les produits
 class itemStock(CustomModel):
     STORE_A = 'store_a'
@@ -175,8 +159,6 @@ class OrderLine(models.Model):
     order               = models.ForeignKey(Order, related_name='orderItem', on_delete=models.CASCADE)
     quantity            = models.IntegerField(default=0)
    
-
-
 #Les regies peuvent faire les boredereaux afin de servire les unites
 #ou les indivudus.CustomModel
 class Discharge(CustomModel):
@@ -190,20 +172,20 @@ class Discharge(CustomModel):
         
     FULL        = 'full' # BORDEREAUX COMPLET
     KIND        = 'espece' # BORDEREAUX ESPECE;
-    
   
     CHOICES_CATEGORY = (
         (FULL, 'Full'), #COMPLETE
         (KIND, 'Kind'), #ESPECE
     )
   
-    discharged          = models.BooleanField(default=False)
-    
-    type_disch          = models.CharField(choices=CHOICES_TYPE, default=SLIP, max_length=10)
+    unit                = models.ForeignKey(Unit, related_name='dislines_units', on_delete=models.CASCADE, null=True)
     category            = models.CharField(choices=CHOICES_CATEGORY, default=FULL, max_length=10)
+    type_disch          = models.CharField(choices=CHOICES_TYPE, default=SLIP, max_length=10)
+    discharged          = models.BooleanField(default=False)
     file                = models.FileField(upload_to="Decharges/%Y/", blank=True, null=True)
     start_at            = models.DateTimeField(default=None , blank=True, null=True)
     end_at              = models.DateTimeField(default=None , blank=True, null=True)
+    status              = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Event from {self.start} to {self.end}"  
@@ -211,44 +193,48 @@ class Discharge(CustomModel):
 #Les lignes des bordereaux
 class DischargedLines(models.Model):
     discharge       = models.ForeignKey(Discharge, related_name='discharge_line', on_delete=models.CASCADE)
-    unit            = models.ForeignKey(Unit, related_name='dischargelines_units', on_delete=models.CASCADE)
     offset          = models.IntegerField(default=0)  # La compensation de pour les unites
     forfait         = models.BooleanField(default=False)
     item            = models.ForeignKey(Item, related_name='item_line_disch', on_delete=models.CASCADE)
     
 #les unités peuvent avoir besion des depenses en plus les denrees
-class Spend(CustomModel, CustomFields):
+class Spend(CustomFields):
     
     FOOD  = 'food'# Les menu depenses
     OTHER = 'other'# Les autres dépenses
-    SPEND = 'spend'# Les dépenses
     
     CHOICES_TYPE = (
         (FOOD, 'Food'),
         (OTHER, 'Other'),
-        (SPEND, 'Spend'),
     )
     
     image               = models.ImageField(upload_to='menu_images/', default='user_images/default.jpg', blank=True, null=True)
     type_menu           = models.CharField(choices=CHOICES_TYPE, default=FOOD, max_length=10)
     rate                = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     price               = models.DecimalField(max_digits=20, decimal_places=2, default=0)
-    discharges          = models.ForeignKey(Discharge, related_name='spens_disch', on_delete=models.CASCADE, null=True)
       
 
-
-
+class OtherSpend(CustomFields):
+    ref       = models.CharField(max_length=50, unique=True, null=True)
+    created_at  = models.DateTimeField(auto_now_add=True )
+    modified_at = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=255)
+    status = models.BooleanField(default=True)
+    description = models.TextField(blank=True, null=True)
+    discharge           = models.ForeignKey(Discharge, related_name='spens_disch', on_delete=models.CASCADE, null=True)
+    image               = models.ImageField(upload_to='menu_images/', default='user_images/default.jpg', blank=True, null=True)
+    amount              = models.DecimalField(max_digits=20, decimal_places=0, default=0)
+    
 #La gestion du temps
 ################################
  
 class Archives(models.Model):
     order            = models.ForeignKey(Order, related_name='order_archiv', on_delete=models.CASCADE, null=True)
     discharge        = models.ForeignKey(Discharge, related_name='discharge_archiv', on_delete=models.CASCADE, null=True)
+    effective        = models.IntegerField(default=0)# L'effectif n'est 
     date             = models.DateField(auto_now_add=True)
     nomber_of_days   = models.IntegerField(default=0)
   
-        
-## LES CLASSES 
 
 ##Les signateurs
 class SignalOperators(CustomModel):

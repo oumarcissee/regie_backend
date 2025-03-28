@@ -11,6 +11,6 @@ class DischargedLinesWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model   = DischargedLines
         # exclude = ['unites']  # Exclut 'custom_id' pour les requêtes POST, PUT, PATCH
-        # fields = '__all__'
+        fields = '__all__'
        # depth  = 1
         

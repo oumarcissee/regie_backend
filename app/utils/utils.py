@@ -4,25 +4,34 @@ from rest_framework.response import Response
 from django.core.mail import send_mail
 from django.db import models
 from django.db.models import  signals
+from datetime import datetime
 
 import random
 
 
-from django.db.models import Max
 
 
-class CustomDate(models.Model):
-    created_at  = models.DateTimeField(auto_now_add=True)
-    modified_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        abstract = True
-
-class CustomModel(CustomDate):
+class CustomModel(models.Model):
     ref       = models.CharField(max_length=50, unique=True, null=True)
+    created_at  = models.DateTimeField(auto_now_add=True )
+    modified_at = models.DateTimeField(auto_now=True)
+    
     class Meta:
         abstract = True  # Cette classe est abstraite pour être étendue
 
+    
+class CustomFields(models.Model):
+    ref       = models.CharField(max_length=50, unique=True, null=True)
+    created_at  = models.DateTimeField(auto_now_add=True )
+    modified_at = models.DateTimeField(auto_now=True)
+
+    name = models.CharField(max_length=255, unique=True)
+    status = models.BooleanField(default=True)
+    description = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        abstract = True
 
         """formats
         """

@@ -9,6 +9,6 @@ class ItemReadSerializer(serializers.ModelSerializer):
 class ItemWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        exclude = ['ref','id']  # Exclut 'custom_id' pour les requêtes POST, PUT, PATCH
+        exclude = ['ref']  # Exclut 'custom_id' pour les requêtes POST, PUT, PATCH
         # fields = '__all__'
         
